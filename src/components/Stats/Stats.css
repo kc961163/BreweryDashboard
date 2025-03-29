@@ -1,0 +1,11 @@
+/* src/components/Stats/Stats.css */
+.stats {
+    background-color: #0f0f0f;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+  }
+  .stats p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
