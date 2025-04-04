@@ -25,22 +25,29 @@ The following **required** functionality is completed:
   - The filter **correctly** filters items in the list, only displaying items matching the filter attribute in the dashboard
   - The dashboard list dynamically updates as the user adjusts the filter
 
-## Optional Features
-
 The following **optional** features are implemented:
 
-- Metadata display with aggregate statistics about all breweries in the database
-- Random brewery generator for exploring new options
-- Active filter tags with the ability to remove individual filters
-- Autocomplete suggestions for brewery searches
-- Responsive design that works on mobile and desktop devices
-- Color-coded brewery type badges for easy visual identification
+- [X] Multiple filters can be applied simultaneously
+- [X] Filters use different input types
+  - e.g., as a text input, a dropdown or radio selection, and/or a slider
+- [X] The user can enter specific bounds for filter values
+
+## Additional Features
+
+The following **additional** features are implemented:
+
+- **Metadata display** with aggregate statistics about all breweries in the database.
+- **Random brewery generator** for exploring new options.
+- **Active filter tags** with the ability to remove individual filters.
+- **Autocomplete suggestions** for brewery searches.
+- **Responsive design** that works on mobile and desktop devices.
+- **Color-coded brewery type badges** for easy visual identification.
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='project_4.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Notes
 
