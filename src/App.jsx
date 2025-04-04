@@ -1,11 +1,22 @@
 // src/App.jsx
 import React from "react";
 import "./App.css";
-import Dashboard from "./components/DashBoard/Dashboard";
+import Dashboard from "./components/Dashboard/Dashboard";
 import { useBreweries } from "./hooks/useBreweries";
 
 function App() {
-  const { data, error, loading } = useBreweries();
+  const { 
+    data, 
+    error, 
+    loading,
+    currentQuery,          // Get the current query state
+    searchData, 
+    searchWithoutLoading,  // Get the new function
+    fetchDefaultData,
+    fetchRandom,
+    getAutocomplete,
+    fetchMeta
+  } = useBreweries();
 
   if (loading) {
     return <p style={{ color: "white", textAlign: "center" }}>Loading...</p>;
@@ -17,7 +28,17 @@ function App() {
 
   return (
     <div className="app">
-      <Dashboard data={data} />
+      <h1>Brewery Explorer</h1>
+      <Dashboard 
+        data={data} 
+        searchData={searchData}
+        searchWithoutLoading={searchWithoutLoading}
+        fetchDefaultData={fetchDefaultData}
+        fetchRandom={fetchRandom}
+        getAutocomplete={getAutocomplete}
+        fetchMeta={fetchMeta}
+        currentQuery={currentQuery}
+      />
     </div>
   );
 }

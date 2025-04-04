@@ -1,25 +1,30 @@
 // src/hooks/useBreweries.js
 import { useState, useEffect } from "react";
 
-// Define a threshold for rate limit warnings
 const RATE_LIMIT_THRESHOLD = 1;
 
-// Helper function to check rate limit header
+/**
+ * Checks the API rate limit.
+ * @param {Response} response - The fetch response object.
+ * @returns {Object} - { valid: boolean, remaining: number | null }
+ */
 async function checkRateLimit(response) {
-  const rateRemaining = response.headers.get("X-RateLimit-Remaining");
-  if (rateRemaining && parseInt(rateRemaining) < RATE_LIMIT_THRESHOLD) {
+  const rateRemainingHeader = response.headers.get("X-RateLimit-Remaining");
+  const remaining = rateRemainingHeader ? parseInt(rateRemainingHeader) : null;
+  if (remaining !== null && remaining < RATE_LIMIT_THRESHOLD) {
     alert("Warning: API rate limit is nearly exceeded. Please try again later.");
-    return false;
+    return { valid: false, remaining };
   }
-  return true;
+  return { valid: true, remaining };
 }
 
-// Function to fetch a single brewery by ID
+// Fetch a single brewery by ID
 export async function getBreweryById(id) {
   try {
     const response = await fetch(`https://api.openbrewerydb.org/v1/breweries/${id}`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error fetching brewery: ${response.status}`);
@@ -31,13 +36,14 @@ export async function getBreweryById(id) {
   }
 }
 
-// Function to fetch a list of breweries with optional parameters
+// Fetch a list of breweries with optional parameters
 export async function getBreweries(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString();
     const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?${queryString}`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error fetching breweries: ${response.status}`);
@@ -49,12 +55,13 @@ export async function getBreweries(params = {}) {
   }
 }
 
-// Function to fetch a random brewery
+// Fetch a random brewery
 export async function getRandomBrewery() {
   try {
     const response = await fetch(`https://api.openbrewerydb.org/v1/breweries/random`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error fetching random brewery: ${response.status}`);
@@ -67,12 +74,15 @@ export async function getRandomBrewery() {
   }
 }
 
-// Function to search breweries by query
+// Search breweries by query
 export async function searchBreweries(query) {
   try {
-    const response = await fetch(`https://api.openbrewerydb.org/v1/breweries/search?query=${encodeURIComponent(query)}`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const response = await fetch(
+      `https://api.openbrewerydb.org/v1/breweries/search?query=${encodeURIComponent(query)}`
+    );
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error searching breweries: ${response.status}`);
@@ -84,12 +94,15 @@ export async function searchBreweries(query) {
   }
 }
 
-// Function to get autocomplete suggestions
+// Get autocomplete suggestions
 export async function autocompleteBreweries(query) {
   try {
-    const response = await fetch(`https://api.openbrewerydb.org/v1/breweries/autocomplete?query=${encodeURIComponent(query)}`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const response = await fetch(
+      `https://api.openbrewerydb.org/v1/breweries/autocomplete?query=${encodeURIComponent(query)}`
+    );
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error fetching autocomplete: ${response.status}`);
@@ -101,13 +114,14 @@ export async function autocompleteBreweries(query) {
   }
 }
 
-// Function to get metadata about breweries with optional filters
+// Fetch metadata about breweries with optional filters
 export async function getBreweryMeta(filters = {}) {
   try {
     const queryString = new URLSearchParams(filters).toString();
     const response = await fetch(`https://api.openbrewerydb.org/v1/breweries/meta?${queryString}`);
-    if (!(await checkRateLimit(response))) {
-      return { error: "Rate limit nearly exceeded" };
+    const rateCheck = await checkRateLimit(response);
+    if (!rateCheck.valid) {
+      return { error: "Rate limit nearly exceeded", remaining: rateCheck.remaining };
     }
     if (!response.ok) {
       throw new Error(`Error fetching metadata: ${response.status}`);
@@ -119,26 +133,80 @@ export async function getBreweryMeta(filters = {}) {
   }
 }
 
-// Optional: Create a custom hook to manage brewery data in your app
+// Custom hook to manage brewery data and expose all API functions
 export function useBreweries() {
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // Add state for tracking the current search query
+  const [currentQuery, setCurrentQuery] = useState("");
 
-  // Example: Fetch a list of breweries on mount
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const breweries = await getBreweries({ per_page: 10 });
-      if (breweries.error) {
-        setError(breweries.error);
-      } else {
-        setData(breweries);
-      }
-      setLoading(false);
+  // Function to fetch default list of breweries
+  async function fetchDefaultData(params = {}) {
+    // setLoading(true);
+    // Clear the current query when resetting to default
+    setCurrentQuery("");
+    
+    const breweries = await getBreweries(params);
+    if (breweries.error) {
+      setError(breweries.error);
+    } else {
+      setData(breweries);
     }
-    fetchData();
+    // setLoading(false);
+  }
+
+
+  // Modified function to search for breweries based on a query
+  async function searchData(query) {
+    if (!query) return;
+    
+    // Store the search query at the hook level
+    setCurrentQuery(query);
+    
+    const results = await searchBreweries(query);
+    if (results.error) {
+      setError(results.error);
+    } else {
+      setData(results);
+    }
+  }
+
+  // Fetch a random brewery and update data
+  async function fetchRandom() {
+    
+    const randomBrewery = await getRandomBrewery();
+    if (randomBrewery.error) {
+      setError(randomBrewery.error);
+    } else {
+      setData([randomBrewery]);
+    }
+  }
+
+  // Optional: Get autocomplete suggestions
+  async function getAutocomplete(query) {
+    return await autocompleteBreweries(query);
+  }
+
+  // Optional: Fetch metadata
+  async function fetchMeta(filters = {}) {
+    return await getBreweryMeta(filters);
+  }
+
+  useEffect(() => {
+    fetchDefaultData();
   }, []);
 
-  return { data, error, loading };
+  return {
+    data,
+    error,
+    loading,
+    currentQuery,          // Expose the current query
+    searchData,
+    fetchDefaultData,
+    fetchRandom,
+    getBreweryById,        // Exposing function to fetch a single brewery by ID
+    getAutocomplete,       // Exposing autocomplete function
+    fetchMeta,             // Exposing metadata fetch function
+  };
 }

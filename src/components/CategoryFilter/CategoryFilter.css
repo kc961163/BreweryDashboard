@@ -1,9 +1,263 @@
 /* src/components/CategoryFilter/CategoryFilter.css */
-.category-filter {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
+
+.filters-container {
+  margin-bottom: 1.5rem;
+}
+
+/* Filter form */
+.filter-form {
+  margin-bottom: 1rem;
+}
+
+/* Basic filters section */
+.basic-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: flex-end;
+}
+
+/* Filter group - common styling */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 180px;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+/* Select dropdowns */
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: white;
+  font-size: 0.9rem;
+  height: 40px;
+}
+
+.filter-select:focus {
+  border-color: #007acc;
+  outline: none;
+}
+
+/* Input fields */
+.filter-input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: white;
+  font-size: 0.9rem;
+  height: 40px;
+}
+
+.filter-input:focus {
+  border-color: #007acc;
+  outline: none;
+}
+
+.filter-input::placeholder {
+  color: #666;
+}
+
+/* Toggle button for advanced filters */
+.toggle-advanced-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #ccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  height: 40px;
+  white-space: nowrap;
+}
+
+.toggle-advanced-btn:hover {
+  background-color: #444;
+  color: white;
+}
+
+/* Advanced filters section */
+.advanced-filters {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #444;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Filter actions section */
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* Apply filters button */
+.apply-filters-btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  border: none;
+  background-color: #9c27b0; /* Purple color */
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.apply-filters-btn:hover {
+  background-color: #b52cc7;
+}
+
+/* Active filters display */
+.active-filters-display {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: 1px solid #444;
+}
+
+.active-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.active-filters-header span {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ccc;
+}
+
+/* Clear all button */
+.clear-all-btn {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: transparent;
+  color: #ccc;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.clear-all-btn:hover {
+  background-color: #444;
+  color: white;
+}
+
+/* Filter tags container */
+.filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Individual filter tag */
+.filter-tag {
+  display: flex;
+  align-items: center;
+  background-color: #444;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Remove tag button */
+.remove-tag-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.1rem;
+  margin-left: 0.25rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.remove-tag-btn:hover {
+  color: white;
+}
+
+/* Control group for buttons */
+.control-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Action buttons */
+.action-button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.random-button {
+  background-color: #9c27b0; /* Purple color */
+  color: white;
+}
+
+.random-button:hover {
+  background-color: #b52cc7;
+}
+
+.reset-button {
+  background-color: #607d8b; /* Bluish gray */
+  color: white;
+}
+
+.reset-button:hover {
+  background-color: #78909c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .basic-filters {
+    flex-direction: column;
+    align-items: stretch;
   }
+  
+  .toggle-advanced-btn {
+    margin-top: 0.5rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+  }
+  
+  .control-group {
+    flex-direction: column;
+  }
+}
