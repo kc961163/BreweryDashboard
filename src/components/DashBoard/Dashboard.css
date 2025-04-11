@@ -18,6 +18,7 @@
   padding: 1rem;
   border-bottom: 1px solid #444;
   transition: background-color 0.2s;
+  cursor: pointer;  /* Add cursor pointer to indicate clickable */
 }
 
 .dashboard-row:hover {
@@ -27,6 +28,18 @@
 /* Remove the bottom border on the last row */
 .dashboard-row:last-child {
   border-bottom: none;
+}
+
+/* Brewery link styling - NEW */
+.brewery-link {
+  text-decoration: none;  /* Remove default link underline */
+  color: inherit;         /* Inherit text color from parent */
+  display: block;         /* Make link a block element */
+  flex: 1;                /* Make link take up available space */
+}
+
+.brewery-link:hover .brewery-name {
+  color: #007acc;         /* Change brewery name color on hover */
 }
 
 /* Brewery information section */
@@ -39,6 +52,7 @@
   margin: 0 0 0.35rem 0;
   font-size: 1.1rem;
   color: #f5f5f5;
+  transition: color 0.2s; /* Add transition for smooth color change on hover */
 }
 
 /* Brewery address styling */
@@ -161,6 +175,16 @@
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Visualization button specific styling */
+.visualization-button {
+  background-color: #007acc;
+  color: white;
+}
+
+.visualization-button:hover {
+  background-color: #0098ff;
 }
 
 /* Responsive adjustments */

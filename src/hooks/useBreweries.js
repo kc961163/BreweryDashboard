@@ -39,7 +39,22 @@ export async function getBreweryById(id) {
 // Fetch a list of breweries with optional parameters
 export async function getBreweries(params = {}) {
   try {
-    const queryString = new URLSearchParams(params).toString();
+    // Filter out empty string values
+    const cleanParams = {};
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== "" && value !== null && value !== undefined) {
+        cleanParams[key] = value;
+      }
+    });
+    
+    // Always include per_page parameter
+    if (!cleanParams.per_page) {
+      cleanParams.per_page = 10;
+    }
+    
+    const queryString = new URLSearchParams(cleanParams).toString();
+    console.log(`Making request to: https://api.openbrewerydb.org/v1/breweries?${queryString}`);
+    
     const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?${queryString}`);
     const rateCheck = await checkRateLimit(response);
     if (!rateCheck.valid) {
@@ -140,12 +155,16 @@ export function useBreweries() {
   const [loading, setLoading] = useState(false);
   // Add state for tracking the current search query
   const [currentQuery, setCurrentQuery] = useState("");
+  const [currentFilters, setCurrentFilters] = useState({ per_page: 10 });
 
   // Function to fetch default list of breweries
   async function fetchDefaultData(params = {}) {
     // setLoading(true);
     // Clear the current query when resetting to default
     setCurrentQuery("");
+
+    // Add this line to update the global filter state
+    setCurrentFilters(params);
     
     const breweries = await getBreweries(params);
     if (breweries.error) {
@@ -153,7 +172,6 @@ export function useBreweries() {
     } else {
       setData(breweries);
     }
-    // setLoading(false);
   }
 
 
@@ -193,6 +211,10 @@ export function useBreweries() {
     return await getBreweryMeta(filters);
   }
 
+  function updateFilters(filters) {
+    setCurrentFilters(filters);
+  }
+
   useEffect(() => {
     fetchDefaultData();
   }, []);
@@ -201,12 +223,14 @@ export function useBreweries() {
     data,
     error,
     loading,
-    currentQuery,          // Expose the current query
+    currentQuery,
+    currentFilters,
+    updateFilters,     
     searchData,
     fetchDefaultData,
     fetchRandom,
-    getBreweryById,        // Exposing function to fetch a single brewery by ID
-    getAutocomplete,       // Exposing autocomplete function
-    fetchMeta,             // Exposing metadata fetch function
+    getBreweryById,
+    getAutocomplete,
+    fetchMeta,
   };
 }

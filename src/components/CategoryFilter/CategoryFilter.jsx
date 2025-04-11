@@ -1,5 +1,5 @@
 // src/components/CategoryFilter/CategoryFilter.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./CategoryFilter.css";
 
 // Brewery types based on the API documentation
@@ -95,7 +95,7 @@ function CategoryFilter({ onSelectCategory, appliedFilters = {} }) {
     };
     
     setSelectedFilters(emptyFilters);
-    onSelectCategory("", { per_page: 10 });
+    onSelectCategory("", emptyFilters); // Pass the FULL emptyFilters object
   };
 
   // Remove a specific filter
@@ -114,6 +114,19 @@ function CategoryFilter({ onSelectCategory, appliedFilters = {} }) {
     // Apply the updated filters
     onSelectCategory("", newFilters);
   };
+
+  useEffect(() => {
+    setSelectedFilters({
+      by_type: appliedFilters.by_type || "",
+      by_state: appliedFilters.by_state || "",
+      by_city: appliedFilters.by_city || "",
+      by_postal: appliedFilters.by_postal || "",
+      by_name: appliedFilters.by_name || "",
+      by_country: appliedFilters.by_country || "",
+      per_page: appliedFilters.per_page || 10,
+      sort: appliedFilters.sort || ""
+    });
+  }, [appliedFilters]);
 
   return (
     <div className="filters-container">

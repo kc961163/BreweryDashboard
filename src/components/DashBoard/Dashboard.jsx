@@ -5,6 +5,8 @@ import SearchBar from "../SearchBar/SearchBar";
 import CategoryFilter from "../CategoryFilter/CategoryFilter";
 import Stats from "../Stats/Stats";
 import MetadataDisplay from "../MetadataDisplay/MetadataDisplay";
+import Visualizations from "../Visualizations/Visualizations"; // Import the new component
+import { Link } from "react-router-dom";
 
 function Dashboard({ 
   data, 
@@ -14,7 +16,9 @@ function Dashboard({
   fetchRandom,
   getAutocomplete,
   fetchMeta,
-  currentQuery  // Use this prop
+  currentQuery,
+  currentFilters,   
+  updateFilters
 }) {
   const [isSearching, setIsSearching] = useState(false);
   
@@ -22,9 +26,10 @@ function Dashboard({
   const [searchQuery, setSearchQuery] = useState(currentQuery || "");
   
   // Track applied filters
-  const [appliedFilters, setAppliedFilters] = useState({
-    per_page: 10
-  });
+  const [appliedFilters, setAppliedFilters] = useState(currentFilters);
+  
+  // New state for toggling visualizations
+  const [showVisualizations, setShowVisualizations] = useState(false);
   
   // Handle search submission from the search bar
   const handleSearch = async (query) => {
@@ -41,8 +46,9 @@ function Dashboard({
   const handleCategoryFilter = async (query, filters = {}) => {
     setIsSearching(true);
     
-    // Update the applied filters
+    // Update both local and global filter state
     setAppliedFilters(filters);
+    updateFilters(filters);  // Add this line to update global state
     
     // If we have a query, use search, otherwise use fetchDefaultData
     if (query) {
@@ -62,7 +68,9 @@ function Dashboard({
     setIsSearching(true);
     
     // Clear filters and search query
-    setAppliedFilters({});
+    const emptyFilters = {};
+    setAppliedFilters(emptyFilters);
+    updateFilters(emptyFilters); 
     setSearchQuery("random");
     
     await fetchRandom();
@@ -71,9 +79,16 @@ function Dashboard({
   
   // Reset to default view
   const handleReset = () => {
-    setAppliedFilters({ per_page: 10 });
+    const defaultFilters = { per_page: 10 };
+    setAppliedFilters(defaultFilters);
+    updateFilters(defaultFilters);  // Add this line to update global state
     setSearchQuery("");
-    fetchDefaultData();
+    fetchDefaultData(defaultFilters); // Pass defaultFilters here too
+  };
+
+  // Toggle visualizations
+  const toggleVisualizations = () => {
+    setShowVisualizations(!showVisualizations);
   };
 
   useEffect(() => {
@@ -82,21 +97,25 @@ function Dashboard({
     }
   }, [currentQuery]);
 
+  useEffect(() => {
+    setAppliedFilters(currentFilters);
+  }, [currentFilters]);
+
   return (
     <div>
       {/* Metadata display */}
       <MetadataDisplay 
         fetchMeta={fetchMeta} 
         currentFilter={searchQuery ? `Search: ${searchQuery}` : (appliedFilters.by_type ? `Type: ${appliedFilters.by_type}` : "")}
-        />
+      />
       
       <div className="card">
         {/* Search bar */}
         <SearchBar 
           onSearch={handleSearch}
           getAutocomplete={getAutocomplete}
-          value={searchQuery}        // Pass down searchQuery as value
-          onChange={setSearchQuery}  // Pass state setter as onChange
+          value={searchQuery}
+          onChange={setSearchQuery}
         />
         
         {/* Category filter - pass applied filters to maintain state */}
@@ -121,8 +140,21 @@ function Dashboard({
           >
             Reset All
           </button>
+          <button
+            onClick={toggleVisualizations}
+            className="action-button visualization-button"
+          >
+            {showVisualizations ? "Hide Charts" : "Show Charts"}
+          </button>
         </div>
       </div>
+      
+      {/* Visualization Component */}
+      <Visualizations 
+        data={data}
+        isVisible={showVisualizations}
+        fetchMeta={fetchMeta}
+      />
       
       {/* Results display */}
       {isSearching ? (
@@ -134,14 +166,17 @@ function Dashboard({
             {data && data.length > 0 ? (
               data.map((brewery) => (
                 <div key={brewery.id} className="dashboard-row">
-                  <div className="brewery-info">
-                    <h3 className="brewery-name">{brewery.name}</h3>
-                    <p className="brewery-address">
-                      {brewery.street && `${brewery.street}, `}
-                      {brewery.city}, {brewery.state_province} 
-                      {brewery.postal_code && ` ${brewery.postal_code}`}
-                    </p>
-                  </div>
+                  {/* Wrap brewery information with Link component */}
+                  <Link to={`/brewery/${brewery.id}`} className="brewery-link">
+                    <div className="brewery-info">
+                      <h3 className="brewery-name">{brewery.name}</h3>
+                      <p className="brewery-address">
+                        {brewery.street && `${brewery.street}, `}
+                        {brewery.city}, {brewery.state_province} 
+                        {brewery.postal_code && ` ${brewery.postal_code}`}
+                      </p>
+                    </div>
+                  </Link>
                   <div className="brewery-meta">
                     <span className={`type-badge ${brewery.brewery_type}`}>
                       {brewery.brewery_type}

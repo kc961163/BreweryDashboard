@@ -1,7 +1,9 @@
 // src/App.jsx
 import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./components/Dashboard/Dashboard";
+import BreweryDetail from "./components/BreweryDetail/BreweryDetail";
 import { useBreweries } from "./hooks/useBreweries";
 
 function App() {
@@ -9,13 +11,15 @@ function App() {
     data, 
     error, 
     loading,
-    currentQuery,          // Get the current query state
+    currentQuery,
+    currentFilters,
+    updateFilters,
     searchData, 
-    searchWithoutLoading,  // Get the new function
     fetchDefaultData,
     fetchRandom,
     getAutocomplete,
-    fetchMeta
+    fetchMeta,
+    getBreweryById
   } = useBreweries();
 
   if (loading) {
@@ -27,19 +31,40 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <h1>Brewery Explorer</h1>
-      <Dashboard 
-        data={data} 
-        searchData={searchData}
-        searchWithoutLoading={searchWithoutLoading}
-        fetchDefaultData={fetchDefaultData}
-        fetchRandom={fetchRandom}
-        getAutocomplete={getAutocomplete}
-        fetchMeta={fetchMeta}
-        currentQuery={currentQuery}
-      />
-    </div>
+    <BrowserRouter>
+      <div className="app">
+        <h1>Brewery Explorer</h1>
+        <Routes>
+          <Route path="/" element={
+            <Dashboard 
+              data={data} 
+              searchData={searchData}
+              fetchDefaultData={fetchDefaultData}
+              fetchRandom={fetchRandom}
+              getAutocomplete={getAutocomplete}
+              fetchMeta={fetchMeta}
+              currentQuery={currentQuery}
+              currentFilters={currentFilters} 
+              updateFilters={updateFilters}
+            />
+          } />
+          
+          {/* Removed fetchMeta from props passed to BreweryDetail */}
+          <Route path="/brewery/:id" element={
+            <BreweryDetail 
+              getBreweryById={getBreweryById}
+              searchData={searchData}
+              fetchDefaultData={fetchDefaultData}
+              fetchRandom={fetchRandom}
+              getAutocomplete={getAutocomplete}
+              currentQuery={currentQuery}
+              currentFilters={currentFilters}
+              updateFilters={updateFilters}
+            />
+          } />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
